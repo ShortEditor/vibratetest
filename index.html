@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detective Arjun – Trailer Experience</title>
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .container {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 32px;
+      padding: 16px;
+      box-sizing: border-box;
+      background: rgba(24,24,24,0.98);
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+    }
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    video {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      background: #000;
+      outline: none;
+    }
+    .note {
+      text-align: center;
+      color: #bbb;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .vibe-status {
+      text-align: center;
+      font-size: 0.98rem;
+      color: #6ee7b7;
+      min-height: 22px;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 600px) {
+      .container { max-width: 100vw; padding: 8px; }
+      h1 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Detective Arjun – Trailer Experience</h1>
+    <div class="note">Enjoy the trailer! Your phone will vibrate at key moments.</div>
+    <div class="vibe-status" id="vibeStatus"></div>
+    <video id="trailer" controls preload="auto" playsinline>
+      <source src="DetectiveArjunTrailer.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+  <script>
+    // Vibration events: time in seconds and vibration pattern
+    const vibrationEvents = [
+      { time: 2, pattern: 100, label: "Small vibration" },
+      { time: 13, pattern: 120, label: "Producer name" },
+      { time: 26, pattern: [100,50,100], label: "Hero intro" },
+      { time: 43, pattern: 80, label: "Small buzz" },
+      { time: 47, pattern: 100, label: "Editor name" },
+      { time: 52, pattern: 100, label: "Short buzz" },
+      { time: 53, pattern: 1000, label: "Strong 1-second buzz" },
+      { time: 57, pattern: 80, label: "Soft buzz" },
+      { time: 62, pattern: 100, label: "Quick buzz" },
+      { time: 65, pattern: 300, label: "Strong bike start" },
+      { time: 71, pattern: 100, label: "Music director name" },
+      { time: 74, pattern: 1000, label: "Riding bike" },
+      { time: 99, pattern: 200, label: "Strong buzz" },
+      { time: 101, pattern: 100, label: "Quick buzz" },
+      { time: 110, pattern: 150, label: "Short buzz" },
+      { time: 112, pattern: 200, label: "Medium buzz" },
+      { time: 116, pattern: 100, label: "Director name" },
+      { time: 119, pattern: [200,100,200], label: "Final buzz" }
+    ];
+    // Map for quick lookup and to ensure one-time trigger
+    const triggered = {};
+    vibrationEvents.forEach((e,i)=>{ triggered[i]=false; });
+    const video = document.getElementById('trailer');
+    const vibeStatus = document.getElementById('vibeStatus');
+    let vibrationSupported = 'vibrate' in navigator;
+    if (!vibrationSupported) {
+      vibeStatus.textContent = "Vibration not supported on this device/browser.";
+    }
+    // Helper: find events within 0.25s window
+    function checkVibrationEvents(currentTime) {
+      vibrationEvents.forEach((evt, idx) => {
+        if (!triggered[idx] && Math.abs(currentTime - evt.time) < 0.25) {
+          if (vibrationSupported) {
+            navigator.vibrate(evt.pattern);
+            vibeStatus.textContent = `Vibration: ${evt.label}`;
+            setTimeout(()=>{vibeStatus.textContent='';}, 1200);
+          }
+          triggered[idx] = true;
+        }
+      });
+    }
+    // Listen to timeupdate
+    video.addEventListener('timeupdate', function() {
+      checkVibrationEvents(video.currentTime);
+    });
+    // Reset triggers if video is restarted
+    video.addEventListener('play', function() {
+      if (video.currentTime < 1) {
+        for (let k in triggered) triggered[k]=false;
+        vibeStatus.textContent = '';
+      }
+    });
+  </script>
+</body>
+</html>
