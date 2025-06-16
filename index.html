@@ -63,7 +63,7 @@
   <div class="container">
     <h1>Detective Arjun – Trailer Experience</h1>
     <div class="note">Enjoy the trailer! Your phone will vibrate at key moments.</div>
-    <div class="vibe-status" id="vibeStatus"></div>
+    <!-- Removed .vibe-status element -->
     <video id="trailer" controls preload="auto" playsinline>
       <source src="DetectiveArjunTrailer.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -83,7 +83,7 @@
       { time: 62, pattern: 100, label: "Quick buzz" },
       { time: 65, pattern: 300, label: "Strong bike start" },
       { time: 71, pattern: 100, label: "Music director name" },
-      { time: 74, pattern: 1000, label: "Riding bike" },
+      { time: 75, pattern: 1000, label: "Riding bike" },
       { time: 99, pattern: 200, label: "Strong buzz" },
       { time: 101, pattern: 100, label: "Quick buzz" },
       { time: 110, pattern: 150, label: "Short buzz" },
@@ -95,33 +95,27 @@
     const triggered = {};
     vibrationEvents.forEach((e,i)=>{ triggered[i]=false; });
     const video = document.getElementById('trailer');
-    const vibeStatus = document.getElementById('vibeStatus');
+    // Removed vibeStatus and status display logic
     let vibrationSupported = 'vibrate' in navigator;
     if (!vibrationSupported) {
-      vibeStatus.textContent = "Vibration not supported on this device/browser.";
+      // Optionally, alert or do nothing
     }
-    // Helper: find events within 0.25s window
     function checkVibrationEvents(currentTime) {
       vibrationEvents.forEach((evt, idx) => {
         if (!triggered[idx] && Math.abs(currentTime - evt.time) < 0.25) {
           if (vibrationSupported) {
             navigator.vibrate(evt.pattern);
-            vibeStatus.textContent = `Vibration: ${evt.label}`;
-            setTimeout(()=>{vibeStatus.textContent='';}, 1200);
           }
           triggered[idx] = true;
         }
       });
     }
-    // Listen to timeupdate
     video.addEventListener('timeupdate', function() {
       checkVibrationEvents(video.currentTime);
     });
-    // Reset triggers if video is restarted
     video.addEventListener('play', function() {
       if (video.currentTime < 1) {
         for (let k in triggered) triggered[k]=false;
-        vibeStatus.textContent = '';
       }
     });
   </script>
